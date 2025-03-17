@@ -1,5 +1,6 @@
 name: Test Case Template
 description: This template helps with writing test cases with predefined steps and expectations.
+projects: ["Test"]
 
 body:
   - type: input
