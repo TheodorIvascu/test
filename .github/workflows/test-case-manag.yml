@@ -2,12 +2,11 @@ name: Test Case Management
 
 on:
   issues:
-    types: [opened, edited, labeled, assigned]
+    types: [opened, edited, labeled, unlabeled]  # ✅ Added `unlabeled` event to detect when `NMI` is removed
 
 permissions:
   issues: write  
   contents: read  
-  projects: write  # ✅ Required to move test cases in the project board
 
 jobs:
   manage-test-cases:
@@ -23,7 +22,6 @@ jobs:
             const issueLabels = issue.labels.map(label => label.name);
             const assignees = issue.assignees.map(assignee => assignee.login);
             const eventType = context.eventName;
-            const projectColumnId = "YOUR_PROJECT_COLUMN_ID_FOR_DONE"; // Replace with your actual column ID
 
             let labelsToAdd = [];
             let labelsToRemove = [];
@@ -34,34 +32,12 @@ jobs:
               return;
             }
 
-            // ✅ Fix: NMI Assignment
-            if (issueLabels.includes("NMI") && !assignees.includes(issue.user.login)) {
-              console.log(`Assigning ${issue.user.login} due to NMI label.`);
-              await github.rest.issues.addAssignees({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                assignees: [issue.user.login]
-              });
-            }
-
-            // ✅ Fix: Updated Label on First Edit
+            // ✅ Handle "Updated" Label (Only Add on First Edit)
             if (eventType === "edited" && !issueLabels.includes("Updated")) {
               labelsToAdd.push("Updated");
-
-              // Remove NMI and unassign reporter on first edit
-              if (issueLabels.includes("NMI")) {
-                labelsToRemove.push("NMI");
-                await github.rest.issues.removeAssignees({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: issue.number,
-                  assignees: [issue.user.login]
-                }).catch(error => console.log("No assignee to remove."));
-              }
             }
 
-            // ✅ Handle Checkboxes for Cross-Browser and Cross-OS
+            // ✅ Handle Cross-Browser and Cross-OS Labels
             if (issueBody.includes("- [x] Cross-browser testing is required")) {
               labelsToAdd.push("Cross-browser");
             } else {
@@ -74,7 +50,41 @@ jobs:
               labelsToRemove.push("Cross-OS");
             }
 
-            // ✅ Fix: Ensure Status: Done is Correctly Applied & Move Issue to "Done" Column
+            // ✅ Assign issue to reporter if "NMI" label is added
+            if (eventType === "labeled" && context.payload.label.name === "NMI") {
+              if (!assignees.includes(issue.user.login)) {
+                await github.rest.issues.addAssignees({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  assignees: [issue.user.login]
+                });
+              }
+            }
+
+            // ✅ Unassign reporter if "NMI" label is removed
+            if (eventType === "unlabeled" && context.payload.label.name === "NMI") {
+              if (assignees.includes(issue.user.login)) {
+                await github.rest.issues.removeAssignees({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  assignees: [issue.user.login]
+                });
+              }
+            }
+
+            // ✅ Handle CNT & Duplicate Labels - Instead of Closing, Add a Comment
+            if (issueLabels.includes("CNT") || issueLabels.includes("Duplicate")) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: "🔹 This test case has been marked as **CNT/Duplicate**."
+              });
+            }
+
+            // ✅ Handle Test Execution Results (Done/Fail)
             if (issueBody.includes("- [x] All expected results have passed") && !issueLabels.includes("Status: Done")) {
               labelsToAdd.push("Status: Done");
               await github.rest.issues.createComment({
@@ -83,20 +93,8 @@ jobs:
                 issue_number: issue.number,
                 body: "✅ This test case has been marked as **Done**."
               });
-
-              // ✅ Move to the "Done" column in the project board
-              try {
-                await github.rest.projects.moveCard({
-                  card_id: projectColumnId,
-                  position: "top"
-                });
-                console.log("Moved issue to 'Done' column in project.");
-              } catch (error) {
-                console.log("Error moving issue to 'Done' column:", error.message);
-              }
             }
 
-            // ✅ Fix: Handle "Fail" Status
             if ((issueBody.includes("- [x] Some expected results have passed") || 
                 issueBody.includes("- [x] All expected results have failed")) 
                 && !issueLabels.includes("Status: Fail")) {
@@ -109,17 +107,7 @@ jobs:
               });
             }
 
-            // ✅ If a test case has "Status: Done" and is NOT failed, add "Test Case Regression Suite"
-            if (issueLabels.includes("Status: Done") && !issueLabels.includes("Status: Fail")) {
-              labelsToAdd.push("Test Case Regression Suite");
-            }
-
-            // ✅ If someone is assigned, add "Status: Progress"
-            if (assignees.length > 0 && !issueLabels.includes("Status: Progress")) {
-              labelsToAdd.push("Status: Progress");
-            }
-
-            // ✅ Apply label updates
+            // ✅ Apply Label Updates
             if (labelsToAdd.length > 0) {
               await github.rest.issues.addLabels({
                 owner: context.repo.owner,
@@ -138,14 +126,4 @@ jobs:
                   name: label
                 }).catch(error => console.log(`Label '${label}' not found or already removed.`));
               }
-            }
-
-            // ✅ Handle CNT & Duplicate labels by adding a comment instead of closing
-            if (issueLabels.includes("CNT") || issueLabels.includes("Duplicate")) {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                body: "🔹 This issue has been found as **CNT/Duplicate**."
-              });
             }
