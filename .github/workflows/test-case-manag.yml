@@ -2,11 +2,11 @@ name: Test Case Management
 
 on:
   issues:
-    types: [opened, edited, labeled]
+    types: [opened, edited, labeled, assigned]
 
 permissions:
-  issues: write  # Grants permission to modify issues (add labels, assign, close)
-  contents: read # Grants permission to read repository contents
+  issues: write  
+  contents: read  
 
 jobs:
   manage-test-cases:
@@ -20,11 +20,28 @@ jobs:
             const issue = context.payload.issue;
             const issueBody = issue.body || "";
             const issueLabels = issue.labels.map(label => label.name);
+            const assignees = issue.assignees.map(assignee => assignee.login);
 
             let labelsToAdd = [];
             let labelsToRemove = [];
 
-            // Check for checkboxes in the issue body
+            // ✅ Add "Updated" label ONLY on the first edit
+            if (context.eventName === "edited" && !issueLabels.includes("Updated")) {
+              labelsToAdd.push("Updated");
+
+              // If NMI is present, remove it and unassign the reporter
+              if (issueLabels.includes("NMI")) {
+                labelsToRemove.push("NMI");
+                await github.rest.issues.removeAssignees({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  assignees: issue.user.login
+                }).catch(error => console.log("No assignee to remove."));
+              }
+            }
+
+            // ✅ Handle checkboxes for cross-browser and cross-OS
             if (issueBody.includes("- [x] Cross-browser testing is required")) {
               labelsToAdd.push("Cross-browser");
             } else {
@@ -37,7 +54,17 @@ jobs:
               labelsToRemove.push("Cross-OS");
             }
 
-            // Add missing labels
+            // ✅ If a test case has "Status: Done" and is NOT failed, add "Test Case Regression Suite"
+            if (issueLabels.includes("Status: Done") && !issueLabels.includes("Status: Fail")) {
+              labelsToAdd.push("Test Case Regression Suite");
+            }
+
+            // ✅ If someone is assigned, add "Status: Progress"
+            if (assignees.length > 0 && !issueLabels.includes("Status: Progress")) {
+              labelsToAdd.push("Status: Progress");
+            }
+
+            // ✅ Apply label updates
             if (labelsToAdd.length > 0) {
               await github.rest.issues.addLabels({
                 owner: context.repo.owner,
@@ -47,7 +74,6 @@ jobs:
               });
             }
 
-            // Remove labels if checkbox is unchecked
             for (let label of labelsToRemove) {
               if (issueLabels.includes(label)) {
                 await github.rest.issues.removeLabel({
@@ -59,54 +85,22 @@ jobs:
               }
             }
 
-            // Assign issue to reporter if "NMI" label is added
-            if (issueLabels.includes("NMI")) {
-              await github.rest.issues.addAssignees({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                assignees: [issue.user.login]
-              });
-            }
-
-            // Close issue if "CNT" or "Duplicate" label is added
+            // ✅ Handle CNT & Duplicate labels by adding a comment instead of closing
             if (issueLabels.includes("CNT") || issueLabels.includes("Duplicate")) {
-              await github.rest.issues.update({
+              await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: issue.number,
-                state: "closed"
+                body: "🔹 This issue has been found as CNT/Duplicate."
               });
             }
 
-            // Handle Test Execution Results and close the issue accordingly
-            if (issueBody.includes("- [x] All expected results have passed")) {
-              await github.rest.issues.addLabels({
+            // ✅ Handle Done/Fail labels by adding a comment instead of closing
+            if (issueLabels.includes("Status: Done") || issueLabels.includes("Status: Fail")) {
+              await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: issue.number,
-                labels: ["Status: Done"]
-              });
-              await github.rest.issues.update({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                state: "closed"
-              });
-            }
-
-            if (issueBody.includes("- [x] Some expected results have passed") || 
-                issueBody.includes("- [x] All expected results have failed")) {
-              await github.rest.issues.addLabels({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                labels: ["Status: Fail"]
-              });
-              await github.rest.issues.update({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                state: "closed"
+                body: `✅ This test case has been marked as ${issueLabels.includes("Status: Done") ? "Done" : "Fail"}.`
               });
             }
