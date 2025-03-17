@@ -1,14 +1,16 @@
 ---
 name: Test Case Template
-description: This template helps with writing test cases with predefined steps and expectations.
+about: This template helps with writing test cases with predefined steps and expectations.
+title: FEATURE - ACTION - EXPECTED RESULT
+labels: QAReview, Test Case
+assignees: ''
+
 ---
 
-**Test Case Title:**
-- Enter the test case title following the format: `FEATURE - ACTION - EXPECTED RESULT`
-
 **Preconditions:**
-- List any preconditions that must be met before executing this test case.
-- E.g., User must be logged in, feature must be enabled.
+List any preconditions that must be met before executing this test case.
+ E.g., User must be logged in, feature must be enabled.
+ E.g., Feature flag enabled, user permissions granted.
 
 **OS to be tested on (Select one or more):**
 - [ ] Windows
@@ -18,16 +20,11 @@ description: This template helps with writing test cases with predefined steps a
 - [ ] iOS
 - [ ] Other (please specify below)
 
-**Other OS (if selected above):**
-- If 'Other' is selected, specify the operating system.
-  - E.g., "Custom OS"
-
 **Cross-OS Testing:**
 - [ ] Cross-OS testing is required
 
 **Device(s) for testing:**
-- Specify the device(s) for testing.
-  - E.g., iPhone 12, MacBook Pro
+
 
 **Browser(s) for testing (Select one or more):**
 - [ ] Chrome
@@ -35,18 +32,10 @@ description: This template helps with writing test cases with predefined steps a
 - [ ] Safari
 - [ ] Edge
 - [ ] Opera
-- [ ] Other (please specify below)
-
-**Other Browser (if selected above):**
-- If 'Other' is selected, specify the browser.
-  - E.g., "Custom Browser"
+- [ ] Other (please specify)
 
 **Cross-Browser Testing:**
 - [ ] Cross-browser testing is required
-
-**Other Preconditions:**
-- List any additional preconditions or setup steps.
-  - E.g., Feature flag enabled, user permissions granted.
 
 **Test Steps:**
 - **Step 1:**
@@ -67,3 +56,6 @@ description: This template helps with writing test cases with predefined steps a
 - [ ] All expected results have passed
 - [ ] Some expected results have passed
 - [ ] All expected results have failed
+
+> [!IMPORTANT]  
+> Expected Results and Test Execution Results will be marked only after execution.
