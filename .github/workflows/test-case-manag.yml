@@ -75,36 +75,38 @@ jobs:
             }
 
             // ✅ Handle CNT & Duplicate Labels - Instead of Closing, Add a Comment
-            if (issueLabels.includes("CNT") || issueLabels.includes("Duplicate")) {
+            if (eventType === "labeled" && (context.payload.label.name === "CNT" || context.payload.label.name === "Duplicate")) {
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: issue.number,
-                body: "🔹 This test case has been marked as **CNT/Duplicate**."
+                body: `🔹 This test case has been marked as **${context.payload.label.name}**.`
               });
             }
 
-            // ✅ Handle Test Execution Results (Done/Fail)
-            if (issueBody.includes("- [x] All expected results have passed") && !issueLabels.includes("Status: Done")) {
-              labelsToAdd.push("Status: Done");
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                body: "✅ This test case has been marked as **Done**."
-              });
-            }
+            // ✅ Handle Test Execution Results (No Auto-Close, Just Labels & Comments)
+            if (eventType === "edited" || eventType === "labeled") {
+              if (issueBody.includes("- [x] All expected results have passed") && !issueLabels.includes("Status: Done")) {
+                labelsToAdd.push("Status: Done");
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  body: "✅ This test case has been marked as **Done**."
+                });
+              }
 
-            if ((issueBody.includes("- [x] Some expected results have passed") || 
-                issueBody.includes("- [x] All expected results have failed")) 
-                && !issueLabels.includes("Status: Fail")) {
-              labelsToAdd.push("Status: Fail");
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                body: "❌ This test case has been marked as **Fail**."
-              });
+              if ((issueBody.includes("- [x] Some expected results have passed") || 
+                  issueBody.includes("- [x] All expected results have failed")) 
+                  && !issueLabels.includes("Status: Fail")) {
+                labelsToAdd.push("Status: Fail");
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  body: "❌ This test case has been marked as **Fail**."
+                });
+              }
             }
 
             // ✅ Apply Label Updates
