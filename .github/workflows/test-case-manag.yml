@@ -2,11 +2,11 @@ name: Test Case Management
 
 on:
   issues:
-    types: [opened, edited, labeled, unlabeled]  # ✅ Added `unlabeled` event to detect when `NMI` is removed
+    types: [opened, edited, labeled]
 
 permissions:
-  issues: write  
-  contents: read  
+  issues: write  # Grants permission to modify issues (add labels, assign, close)
+  contents: read # Grants permission to read repository contents
 
 jobs:
   manage-test-cases:
@@ -20,24 +20,11 @@ jobs:
             const issue = context.payload.issue;
             const issueBody = issue.body || "";
             const issueLabels = issue.labels.map(label => label.name);
-            const assignees = issue.assignees.map(assignee => assignee.login);
-            const eventType = context.eventName;
 
             let labelsToAdd = [];
             let labelsToRemove = [];
 
-            // ✅ Apply workflow ONLY to issues with "Test Case" label
-            if (!issueLabels.includes("Test Case")) {
-              console.log("Skipping: Issue does not have 'Test Case' label.");
-              return;
-            }
-
-            // ✅ Handle "Updated" Label (Only Add on First Edit)
-            if (eventType === "edited" && !issueLabels.includes("Updated")) {
-              labelsToAdd.push("Updated");
-            }
-
-            // ✅ Handle Cross-Browser and Cross-OS Labels
+            // Check for checkboxes in the issue body
             if (issueBody.includes("- [x] Cross-browser testing is required")) {
               labelsToAdd.push("Cross-browser");
             } else {
@@ -50,66 +37,7 @@ jobs:
               labelsToRemove.push("Cross-OS");
             }
 
-            // ✅ Assign issue to reporter if "NMI" label is added
-            if (eventType === "labeled" && context.payload.label.name === "NMI") {
-              if (!assignees.includes(issue.user.login)) {
-                await github.rest.issues.addAssignees({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: issue.number,
-                  assignees: [issue.user.login]
-                });
-              }
-            }
-
-            // ✅ Unassign reporter if "NMI" label is removed
-            if (eventType === "unlabeled" && context.payload.label.name === "NMI") {
-              if (assignees.includes(issue.user.login)) {
-                await github.rest.issues.removeAssignees({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: issue.number,
-                  assignees: [issue.user.login]
-                });
-              }
-            }
-
-            // ✅ Handle CNT & Duplicate Labels - Instead of Closing, Add a Comment
-            if (eventType === "labeled" && (context.payload.label.name === "CNT" || context.payload.label.name === "Duplicate")) {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                body: `🔹 This test case has been marked as **${context.payload.label.name}**.`
-              });
-            }
-
-            // ✅ Handle Test Execution Results (No Auto-Close, Just Labels & Comments)
-            if (eventType === "edited" || eventType === "labeled") {
-              if (issueBody.includes("- [x] All expected results have passed") && !issueLabels.includes("Status: Done")) {
-                labelsToAdd.push("Status: Done");
-                await github.rest.issues.createComment({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: issue.number,
-                  body: "✅ This test case has been marked as **Done**."
-                });
-              }
-
-              if ((issueBody.includes("- [x] Some expected results have passed") || 
-                  issueBody.includes("- [x] All expected results have failed")) 
-                  && !issueLabels.includes("Status: Fail")) {
-                labelsToAdd.push("Status: Fail");
-                await github.rest.issues.createComment({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: issue.number,
-                  body: "❌ This test case has been marked as **Fail**."
-                });
-              }
-            }
-
-            // ✅ Apply Label Updates
+            // Add missing labels
             if (labelsToAdd.length > 0) {
               await github.rest.issues.addLabels({
                 owner: context.repo.owner,
@@ -119,6 +47,7 @@ jobs:
               });
             }
 
+            // Remove labels if checkbox is unchecked
             for (let label of labelsToRemove) {
               if (issueLabels.includes(label)) {
                 await github.rest.issues.removeLabel({
@@ -128,4 +57,56 @@ jobs:
                   name: label
                 }).catch(error => console.log(`Label '${label}' not found or already removed.`));
               }
+            }
+
+            // Assign issue to reporter if "NMI" label is added
+            if (issueLabels.includes("NMI")) {
+              await github.rest.issues.addAssignees({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                assignees: [issue.user.login]
+              });
+            }
+
+            // Close issue if "CNT" or "Duplicate" label is added
+            if (issueLabels.includes("CNT") || issueLabels.includes("Duplicate")) {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                state: "closed"
+              });
+            }
+
+            // Handle Test Execution Results and close the issue accordingly
+            if (issueBody.includes("- [x] All expected results have passed")) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: ["Status: Done"]
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                state: "closed"
+              });
+            }
+
+            if (issueBody.includes("- [x] Some expected results have passed") || 
+                issueBody.includes("- [x] All expected results have failed")) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: ["Status: Fail"]
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                state: "closed"
+              });
             }
