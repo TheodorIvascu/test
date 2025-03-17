@@ -21,12 +21,29 @@ jobs:
             const issueBody = issue.body || "";
             const issueLabels = issue.labels.map(label => label.name);
             const assignees = issue.assignees.map(assignee => assignee.login);
+            const eventType = context.eventName;
 
             let labelsToAdd = [];
             let labelsToRemove = [];
 
-            // ✅ Add "Updated" label ONLY on the first edit
-            if (context.eventName === "edited" && !issueLabels.includes("Updated")) {
+            // ✅ Apply workflow ONLY to issues with "Test Case" label
+            if (!issueLabels.includes("Test Case")) {
+              console.log("Skipping: Issue does not have 'Test Case' label.");
+              return;
+            }
+
+            // ✅ Handle NMI (Assign User When Label is Added)
+            if (eventType === "labeled" && context.payload.label.name === "NMI") {
+              await github.rest.issues.addAssignees({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                assignees: [issue.user.login]
+              });
+            }
+
+            // ✅ When a test case is edited (First Edit Only)
+            if (eventType === "edited" && !issueLabels.includes("Updated")) {
               labelsToAdd.push("Updated");
 
               // If NMI is present, remove it and unassign the reporter
@@ -36,7 +53,7 @@ jobs:
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   issue_number: issue.number,
-                  assignees: issue.user.login
+                  assignees: [issue.user.login]
                 }).catch(error => console.log("No assignee to remove."));
               }
             }
@@ -52,6 +69,28 @@ jobs:
               labelsToAdd.push("Cross-OS");
             } else {
               labelsToRemove.push("Cross-OS");
+            }
+
+            // ✅ Handle Test Results (All Passed = Status: Done, Some/All Failed = Status: Fail)
+            if (issueBody.includes("- [x] All expected results have passed")) {
+              labelsToAdd.push("Status: Done");
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: "✅ This test case has been marked as **Done**."
+              });
+            }
+
+            if (issueBody.includes("- [x] Some expected results have passed") || 
+                issueBody.includes("- [x] All expected results have failed")) {
+              labelsToAdd.push("Status: Fail");
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: "❌ This test case has been marked as **Fail**."
+              });
             }
 
             // ✅ If a test case has "Status: Done" and is NOT failed, add "Test Case Regression Suite"
@@ -91,16 +130,6 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: issue.number,
-                body: "🔹 This issue has been found as CNT/Duplicate."
-              });
-            }
-
-            // ✅ Handle Done/Fail labels by adding a comment instead of closing
-            if (issueLabels.includes("Status: Done") || issueLabels.includes("Status: Fail")) {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                body: `✅ This test case has been marked as ${issueLabels.includes("Status: Done") ? "Done" : "Fail"}.`
+                body: "🔹 This issue has been found as **CNT/Duplicate**."
               });
             }
