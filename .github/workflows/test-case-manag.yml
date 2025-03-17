@@ -5,16 +5,13 @@ on:
     types: [opened, edited, labeled]
 
 permissions:
-  issues: write  # Allows modifying issues (labels, assignments, closing)
-  contents: read # Allows reading repo contents
+  issues: write  # Grants permission to modify issues (add labels, assign, close)
+  contents: read # Grants permission to read repository contents
 
 jobs:
   manage-test-cases:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
       - name: Process test case issue
         uses: actions/github-script@v7
         with:
