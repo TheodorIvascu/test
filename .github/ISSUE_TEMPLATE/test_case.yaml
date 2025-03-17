@@ -92,9 +92,12 @@ body:
       description: "List any additional preconditions or setup steps."
       placeholder: "E.g., Feature flag enabled, user permissions granted."
 
-  - type: markdown
+  - type: textarea
+    id: test-steps
     attributes:
-      value: |
+      label: Test Steps
+      description: "Write out the steps required to execute the test case."
+      placeholder: |
         **Step 1:**
         - Write here step 1
         - [ ] **Expected Results:**
