@@ -18,9 +18,12 @@ body:
     attributes:
       label: Device/Platform for Testing
       options:
-        - Desktop
-        - Mobile
-        - Other (Please specify below)
+        - label: "Desktop"
+          value: "desktop"
+        - label: "Mobile"
+          value: "mobile"
+        - label: "Other (Please specify below)"
+          value: "other"
     validations:
       required: true
   - type: textarea
@@ -33,28 +36,50 @@ body:
     attributes:
       label: Operating System
       options:
-        - Microsoft Windows 10
-        - Microsoft Windows 11
-        - macOS 15 Sequoia
-        - macOS 14 Sonoma
-        - macOS 13 Ventura
-        - macOS 12 Monterey
-        - macOS 11 Big Sur
-        - iOS 14
-        - iOS 15
-        - iOS 16
-        - iOS 17
-        - iOS 18
-        - Android Version 9
-        - Android Version 13
-        - Android Version 14
-        - Android Version 15
-        - Linux Ubuntu
-        - Linux Fedora
-        - Linux Debian
-        - Linux Mint
-        - Chrome OS
-        - Other (Please specify below)
+        - label: "Microsoft Windows 10"
+          value: "windows10"
+        - label: "Microsoft Windows 11"
+          value: "windows11"
+        - label: "macOS 15 Sequoia"
+          value: "macos15"
+        - label: "macOS 14 Sonoma"
+          value: "macos14"
+        - label: "macOS 13 Ventura"
+          value: "macos13"
+        - label: "macOS 12 Monterey"
+          value: "macos12"
+        - label: "macOS 11 Big Sur"
+          value: "macos11"
+        - label: "iOS 14"
+          value: "ios14"
+        - label: "iOS 15"
+          value: "ios15"
+        - label: "iOS 16"
+          value: "ios16"
+        - label: "iOS 17"
+          value: "ios17"
+        - label: "iOS 18"
+          value: "ios18"
+        - label: "Android Version 9"
+          value: "android9"
+        - label: "Android Version 13"
+          value: "android13"
+        - label: "Android Version 14"
+          value: "android14"
+        - label: "Android Version 15"
+          value: "android15"
+        - label: "Linux Ubuntu"
+          value: "linuxubuntu"
+        - label: "Linux Fedora"
+          value: "linuxfedora"
+        - label: "Linux Debian"
+          value: "linuxdebian"
+        - label: "Linux Mint"
+          value: "linuxmint"
+        - label: "Chrome OS"
+          value: "chromeos"
+        - label: "Other (Please specify below)"
+          value: "other"
     validations:
       required: true
   - type: textarea
@@ -67,14 +92,22 @@ body:
     attributes:
       label: Browser(s) to Test (latest versions)
       options:
-        - Chrome
-        - Safari
-        - Edge
-        - Opera
-        - Firefox
-        - Samsung Internet
-        - Brave
-        - Other (Please specify below)
+        - label: "Chrome"
+          value: "chrome"
+        - label: "Safari"
+          value: "safari"
+        - label: "Edge"
+          value: "edge"
+        - label: "Opera"
+          value: "opera"
+        - label: "Firefox"
+          value: "firefox"
+        - label: "Samsung Internet"
+          value: "samsunginternet"
+        - label: "Brave"
+          value: "brave"
+        - label: "Other (Please specify below)"
+          value: "other"
     validations:
       required: true
   - type: textarea
@@ -87,8 +120,10 @@ body:
     attributes:
       label: Website Version to Test
       options:
-        - Local
-        - Production
+        - label: "Local"
+          value: "local"
+        - label: "Production"
+          value: "production"
     validations:
       required: true
   - type: textarea
@@ -136,9 +171,12 @@ body:
     attributes:
       label: Test Case Execution Results
       options:
-        - All expected results passed
-        - Some expected results failed
-        - None of the expected results passed
+        - label: "All expected results passed"
+          value: "all_passed"
+        - label: "Some expected results failed"
+          value: "some_failed"
+        - label: "None of the expected results passed"
+          value: "none_passed"
     validations:
       required: false
   - type: markdown
