@@ -2,15 +2,6 @@ name: Test Case Template
 description: This template helps with writing test cases with predefined steps and expectations.
 
 body:
-  - type: input
-    id: test-case-title
-    attributes:
-      label: Test Case Title
-      description: "Enter the test case title following the format: FEATURE - ACTION - EXPECTED RESULT"
-      placeholder: "FEATURE - ACTION - EXPECTED RESULT"
-    validations:
-      required: true
-
   - type: textarea
     id: preconditions
     attributes:
