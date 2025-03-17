@@ -1,0 +1,148 @@
+name: Test Case Template
+description: Template for creating test cases to identify issues, track reproduction steps, and expected results.
+labels: ["Bug", "QAReview"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please fill out the sections below to help everyone identify and fix the bug
+  - type: textarea
+    id: title
+    attributes:
+      label: Test Case Title
+      placeholder: FEATURE-ACTION-EXPECTED RESULT
+    validations:
+      required: true
+  - type: dropdown
+    id: preconditions_device
+    attributes:
+      label: Device/Platform for Testing
+      options:
+        - Desktop
+        - Mobile
+        - Other (Please specify below)
+    validations:
+      required: true
+  - type: multi-select
+    id: preconditions_os
+    attributes:
+      label: Operating System
+      options:
+        - Microsoft Windows 10
+        - Microsoft Windows 11
+        - macOS 15 Sequoia
+        - macOS 14 Sonoma
+        - macOS 13 Ventura
+        - macOS 12 Monterey
+        - macOS 11 Big Sur
+        - iOS 14
+        - iOS 15
+        - iOS 16
+        - iOS 17
+        - iOS 18
+        - Android Version 9
+        - Android Version 13
+        - Android Version 14
+        - Android Version 15
+        - Linux Ubuntu
+        - Linux Fedora
+        - Linux Debian
+        - Linux Mint
+        - Chrome OS
+        - Other (Please specify below)
+    validations:
+      required: true
+  - type: textarea
+    id: preconditions_os_other
+    attributes:
+      label: Specify OS if "Other" is selected
+      placeholder: Specify the OS you're using if it is not listed above.
+  - type: textarea
+    id: preconditions_device_specify
+    attributes:
+      label: Specify Device(s) if needed
+      placeholder: Specify the device you are testing on (e.g., iPhone 13, Galaxy S20)
+  - type: multi-select
+    id: preconditions_browser
+    attributes:
+      label: Browser(s) to Test (latest versions)
+      options:
+        - Chrome
+        - Safari
+        - Edge
+        - Opera
+        - Firefox
+        - Samsung Internet
+        - Brave
+        - Other (Please specify below)
+    validations:
+      required: true
+  - type: textarea
+    id: preconditions_browser_other
+    attributes:
+      label: Specify Browser if "Other" is selected
+      placeholder: Specify the browser you're testing on if it's not listed above.
+  - type: dropdown
+    id: preconditions_website_version
+    attributes:
+      label: Website Version to Test
+      options:
+        - Local
+        - Production
+    validations:
+      required: true
+  - type: textarea
+    id: preconditions_other
+    attributes:
+      label: Other Preconditions (e.g., Stable internet connection, etc.)
+      placeholder: Add any other conditions here
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe your issue
+      placeholder: Provide a detailed description of the issue you're testing for.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      placeholder: |
+        **Step 1:**
+        //Write here step 1
+        - [ ] **Expected Results:**
+        //Write here expected Results
+
+        **Step 2:**
+        //Write here step 2
+        - [ ] **Expected Results:**
+        //Write here expected Results
+
+        **Step 3:**
+        //Write here step 3
+        - [ ] **Expected Results:**
+        //Write here expected Results
+
+        //Add as many steps as you need using the same format
+    validations:
+      required: true
+  - type: textarea
+    id: attachments
+    attributes:
+      label: Attachments (Optional)
+      placeholder: Attach any relevant screenshots, videos, or logs here.
+  - type: checkboxes
+    id: results_passed
+    attributes:
+      label: Test Case Execution Results
+      options:
+        - All expected results passed
+        - Some expected results failed
+        - None of the expected results passed
+    validations:
+      required: false
+  - type: markdown
+    attributes:
+      value: |
+        **Notes:**
+        The checkboxes above must be filled out by the person executing the test case to indicate whether all expected results were met. Please do not mark them yourself.
