@@ -23,7 +23,12 @@ body:
         - Other (Please specify below)
     validations:
       required: true
-  - type: multi-select
+  - type: text
+    id: preconditions_device_specify
+    attributes:
+      label: Specify Device(s) if needed
+      placeholder: Specify the device you are testing on (e.g., iPhone 13, Galaxy S20)
+  - type: dropdown
     id: preconditions_os
     attributes:
       label: Operating System
@@ -52,17 +57,12 @@ body:
         - Other (Please specify below)
     validations:
       required: true
-  - type: textarea
+  - type: text
     id: preconditions_os_other
     attributes:
       label: Specify OS if "Other" is selected
       placeholder: Specify the OS you're using if it is not listed above.
-  - type: textarea
-    id: preconditions_device_specify
-    attributes:
-      label: Specify Device(s) if needed
-      placeholder: Specify the device you are testing on (e.g., iPhone 13, Galaxy S20)
-  - type: multi-select
+  - type: dropdown
     id: preconditions_browser
     attributes:
       label: Browser(s) to Test (latest versions)
@@ -77,7 +77,7 @@ body:
         - Other (Please specify below)
     validations:
       required: true
-  - type: textarea
+  - type: text
     id: preconditions_browser_other
     attributes:
       label: Specify Browser if "Other" is selected
