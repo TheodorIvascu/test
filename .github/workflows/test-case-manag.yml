@@ -34,12 +34,14 @@ jobs:
 
             // ✅ Handle NMI (Assign User When Label is Added)
             if (eventType === "labeled" && context.payload.label.name === "NMI") {
-              await github.rest.issues.addAssignees({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                assignees: [issue.user.login]
-              });
+              if (!assignees.includes(issue.user.login)) {
+                await github.rest.issues.addAssignees({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  assignees: [issue.user.login]
+                });
+              }
             }
 
             // ✅ When a test case is edited (First Edit Only)
@@ -72,7 +74,7 @@ jobs:
             }
 
             // ✅ Handle Test Results (All Passed = Status: Done, Some/All Failed = Status: Fail)
-            if (issueBody.includes("- [x] All expected results have passed")) {
+            if (issueBody.includes("- [x] All expected results have passed") && !issueLabels.includes("Status: Done")) {
               labelsToAdd.push("Status: Done");
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
@@ -82,8 +84,9 @@ jobs:
               });
             }
 
-            if (issueBody.includes("- [x] Some expected results have passed") || 
-                issueBody.includes("- [x] All expected results have failed")) {
+            if ((issueBody.includes("- [x] Some expected results have passed") || 
+                issueBody.includes("- [x] All expected results have failed")) 
+                && !issueLabels.includes("Status: Fail")) {
               labelsToAdd.push("Status: Fail");
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
