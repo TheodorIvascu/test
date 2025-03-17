@@ -87,7 +87,7 @@ jobs:
               return; // Do not proceed with closing or labeling the issue further
             }
 
-            // Handle Test Execution Results (Passed/Failed) and add labels without closing
+            // Only process test results if the test case label exists
             if (issueBody.includes("- [x] All expected results have passed")) {
               await github.rest.issues.addLabels({
                 owner: context.repo.owner,
