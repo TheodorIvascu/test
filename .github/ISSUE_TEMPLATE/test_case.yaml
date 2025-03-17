@@ -1,186 +1,131 @@
-name: Test Case Template
-description: Template for creating test cases to identify issues, track reproduction steps, and expected results.
-labels: ["Bug", "QAReview"]
 body:
-  - type: markdown
-    attributes:
-      value: |
-        Please fill out the sections below to help everyone identify and fix the bug
-  - type: textarea
-    id: title
+  - type: input
+    id: test-case-title
     attributes:
       label: Test Case Title
-      placeholder: FEATURE-ACTION-EXPECTED RESULT
+      description: "Enter the test case title following the format: FEATURE - ACTION - EXPECTED RESULT"
+      placeholder: "FEATURE - ACTION - EXPECTED RESULT"
     validations:
       required: true
-  - type: dropdown
-    id: preconditions_device
-    attributes:
-      label: Device/Platform for Testing
-      options:
-        - label: "Desktop"
-          value: "desktop"
-        - label: "Mobile"
-          value: "mobile"
-        - label: "Other (Please specify below)"
-          value: "other"
-    validations:
-      required: true
-  - type: textarea
-    id: preconditions_device_specify
-    attributes:
-      label: Specify Device(s) if needed
-      placeholder: Specify the device you are testing on (e.g., iPhone 13, Galaxy S20)
-  - type: dropdown
-    id: preconditions_os
-    attributes:
-      label: Operating System
-      options:
-        - label: "Microsoft Windows 10"
-          value: "windows10"
-        - label: "Microsoft Windows 11"
-          value: "windows11"
-        - label: "macOS 15 Sequoia"
-          value: "macos15"
-        - label: "macOS 14 Sonoma"
-          value: "macos14"
-        - label: "macOS 13 Ventura"
-          value: "macos13"
-        - label: "macOS 12 Monterey"
-          value: "macos12"
-        - label: "macOS 11 Big Sur"
-          value: "macos11"
-        - label: "iOS 14"
-          value: "ios14"
-        - label: "iOS 15"
-          value: "ios15"
-        - label: "iOS 16"
-          value: "ios16"
-        - label: "iOS 17"
-          value: "ios17"
-        - label: "iOS 18"
-          value: "ios18"
-        - label: "Android Version 9"
-          value: "android9"
-        - label: "Android Version 13"
-          value: "android13"
-        - label: "Android Version 14"
-          value: "android14"
-        - label: "Android Version 15"
-          value: "android15"
-        - label: "Linux Ubuntu"
-          value: "linuxubuntu"
-        - label: "Linux Fedora"
-          value: "linuxfedora"
-        - label: "Linux Debian"
-          value: "linuxdebian"
-        - label: "Linux Mint"
-          value: "linuxmint"
-        - label: "Chrome OS"
-          value: "chromeos"
-        - label: "Other (Please specify below)"
-          value: "other"
-    validations:
-      required: true
-  - type: textarea
-    id: preconditions_os_other
-    attributes:
-      label: Specify OS if "Other" is selected
-      placeholder: Specify the OS you're using if it is not listed above.
-  - type: dropdown
-    id: preconditions_browser
-    attributes:
-      label: Browser(s) to Test (latest versions)
-      options:
-        - label: "Chrome"
-          value: "chrome"
-        - label: "Safari"
-          value: "safari"
-        - label: "Edge"
-          value: "edge"
-        - label: "Opera"
-          value: "opera"
-        - label: "Firefox"
-          value: "firefox"
-        - label: "Samsung Internet"
-          value: "samsunginternet"
-        - label: "Brave"
-          value: "brave"
-        - label: "Other (Please specify below)"
-          value: "other"
-    validations:
-      required: true
-  - type: textarea
-    id: preconditions_browser_other
-    attributes:
-      label: Specify Browser if "Other" is selected
-      placeholder: Specify the browser you're testing on if it's not listed above.
-  - type: dropdown
-    id: preconditions_website_version
-    attributes:
-      label: Website Version to Test
-      options:
-        - label: "Local"
-          value: "local"
-        - label: "Production"
-          value: "production"
-    validations:
-      required: true
-  - type: textarea
-    id: preconditions_other
-    attributes:
-      label: Other Preconditions (e.g., Stable internet connection, etc.)
-      placeholder: Add any other conditions here
-  - type: textarea
-    id: description
-    attributes:
-      label: Describe your issue
-      placeholder: Provide a detailed description of the issue you're testing for.
-    validations:
-      required: true
-  - type: textarea
-    id: steps
-    attributes:
-      label: Steps to Reproduce
-      placeholder: |
-        **Step 1:**
-        //Write here step 1
-        - [ ] **Expected Results:**
-        //Write here expected Results
 
-        **Step 2:**
-        //Write here step 2
-        - [ ] **Expected Results:**
-        //Write here expected Results
-
-        **Step 3:**
-        //Write here step 3
-        - [ ] **Expected Results:**
-        //Write here expected Results
-
-        //Add as many steps as you need using the same format
+  - type: textarea
+    id: preconditions
+    attributes:
+      label: Preconditions
+      description: "List any preconditions that must be met before executing this test case."
+      placeholder: "E.g., User must be logged in, feature must be enabled."
     validations:
       required: true
-  - type: textarea
-    id: attachments
-    attributes:
-      label: Attachments (Optional)
-      placeholder: Attach any relevant screenshots, videos, or logs here.
+
   - type: checkboxes
-    id: results_passed
+    id: os-to-be-tested
     attributes:
-      label: Test Case Execution Results
+      label: OS to be tested on
+      description: "Select one or more operating systems to test on."
       options:
-        - label: "All expected results passed"
-          value: "all_passed"
-        - label: "Some expected results failed"
-          value: "some_failed"
-        - label: "None of the expected results passed"
-          value: "none_passed"
+        - label: Windows
+        - label: macOS
+        - label: Linux
+        - label: Android
+        - label: iOS
+        - label: "Other"
+      required: true
+
+  - type: input
+    id: custom-os
+    attributes:
+      label: Other OS (if selected above)
+      description: "If 'Other' is selected, specify the operating system."
+      placeholder: "Enter custom OS"
     validations:
       required: false
+
+  - type: checkboxes
+    id: cross-os
+    attributes:
+      label: Cross-OS Testing
+      description: "Check if the test should be executed on multiple operating systems."
+      options:
+        - label: "Cross-OS testing is required"
+      required: false
+
+  - type: input
+    id: device-or-devices
+    attributes:
+      label: Device or Devices
+      description: "Specify the device(s) for testing (e.g., iPhone 12, Samsung Galaxy S21, MacBook Pro)."
+      placeholder: "E.g., iPhone 12, MacBook Pro"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: browser-or-browsers
+    attributes:
+      label: Browser or Browsers
+      description: "Select one or more browsers to test on."
+      options:
+        - label: Chrome
+        - label: Firefox
+        - label: Safari
+        - label: Edge
+        - label: Opera
+        - label: "Other"
+      required: true
+
+  - type: input
+    id: custom-browser
+    attributes:
+      label: Other Browser (if selected above)
+      description: "If 'Other' is selected, specify the browser."
+      placeholder: "Enter custom browser"
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: cross-browser
+    attributes:
+      label: Cross-Browser Testing
+      description: "Check if the test should be executed across multiple browsers."
+      options:
+        - label: "Cross-browser testing is required"
+      required: false
+
+  - type: textarea
+    id: other-preconditions
+    attributes:
+      label: Other Preconditions
+      description: "List any additional preconditions or setup steps."
+      placeholder: "E.g., Feature flag enabled, user permissions granted."
+    validations:
+      required: false
+
   - type: markdown
     attributes:
       value: |
-        **Notes:**
-        The checkboxes above must be filled out by the person executing the test case to indicate whether all expected results were met. Please do not mark them yourself.
+        **Step 1:**
+        - Write here step 1
+        - [ ] **Expected Results:**
+        - Write here expected results for Step 1
+        
+        **Step 2:**
+        - Write here step 2
+        - [ ] **Expected Results:**
+        - Write here expected results for Step 2
+        
+        **Step 3:**
+        - Write here step 3
+        - [ ] **Expected Results:**
+        - Write here expected results for Step 3
+        
+        <!-- Add more steps as needed following the same format. -->
+
+  - type: checkboxes
+    id: test-results
+    attributes:
+      label: Test Execution Results
+      description: "Indicate whether the expected results passed, failed, or partially passed."
+      options:
+        - label: "All expected results have passed"
+        - label: "Some expected results have passed"
+        - label: "All expected results have failed"
+      required: true
