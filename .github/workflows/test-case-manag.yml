@@ -7,6 +7,7 @@ on:
 permissions:
   issues: write  
   contents: read  
+  projects: write  # ✅ Required to move test cases in the project board
 
 jobs:
   manage-test-cases:
@@ -22,6 +23,7 @@ jobs:
             const issueLabels = issue.labels.map(label => label.name);
             const assignees = issue.assignees.map(assignee => assignee.login);
             const eventType = context.eventName;
+            const projectColumnId = "YOUR_PROJECT_COLUMN_ID_FOR_DONE"; // Replace with your actual column ID
 
             let labelsToAdd = [];
             let labelsToRemove = [];
@@ -32,23 +34,22 @@ jobs:
               return;
             }
 
-            // ✅ Handle NMI (Assign User When Label is Added)
-            if (eventType === "labeled" && context.payload.label.name === "NMI") {
-              if (!assignees.includes(issue.user.login)) {
-                await github.rest.issues.addAssignees({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: issue.number,
-                  assignees: [issue.user.login]
-                });
-              }
+            // ✅ Fix: NMI Assignment
+            if (issueLabels.includes("NMI") && !assignees.includes(issue.user.login)) {
+              console.log(`Assigning ${issue.user.login} due to NMI label.`);
+              await github.rest.issues.addAssignees({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                assignees: [issue.user.login]
+              });
             }
 
-            // ✅ When a test case is edited (First Edit Only)
+            // ✅ Fix: Updated Label on First Edit
             if (eventType === "edited" && !issueLabels.includes("Updated")) {
               labelsToAdd.push("Updated");
 
-              // If NMI is present, remove it and unassign the reporter
+              // Remove NMI and unassign reporter on first edit
               if (issueLabels.includes("NMI")) {
                 labelsToRemove.push("NMI");
                 await github.rest.issues.removeAssignees({
@@ -60,7 +61,7 @@ jobs:
               }
             }
 
-            // ✅ Handle checkboxes for cross-browser and cross-OS
+            // ✅ Handle Checkboxes for Cross-Browser and Cross-OS
             if (issueBody.includes("- [x] Cross-browser testing is required")) {
               labelsToAdd.push("Cross-browser");
             } else {
@@ -73,7 +74,7 @@ jobs:
               labelsToRemove.push("Cross-OS");
             }
 
-            // ✅ Handle Test Results (All Passed = Status: Done, Some/All Failed = Status: Fail)
+            // ✅ Fix: Ensure Status: Done is Correctly Applied & Move Issue to "Done" Column
             if (issueBody.includes("- [x] All expected results have passed") && !issueLabels.includes("Status: Done")) {
               labelsToAdd.push("Status: Done");
               await github.rest.issues.createComment({
@@ -82,8 +83,20 @@ jobs:
                 issue_number: issue.number,
                 body: "✅ This test case has been marked as **Done**."
               });
+
+              // ✅ Move to the "Done" column in the project board
+              try {
+                await github.rest.projects.moveCard({
+                  card_id: projectColumnId,
+                  position: "top"
+                });
+                console.log("Moved issue to 'Done' column in project.");
+              } catch (error) {
+                console.log("Error moving issue to 'Done' column:", error.message);
+              }
             }
 
+            // ✅ Fix: Handle "Fail" Status
             if ((issueBody.includes("- [x] Some expected results have passed") || 
                 issueBody.includes("- [x] All expected results have failed")) 
                 && !issueLabels.includes("Status: Fail")) {
