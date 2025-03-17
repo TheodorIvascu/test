@@ -1,3 +1,6 @@
+name: Test Case Template
+description: This template helps with writing test cases with predefined steps and expectations.
+
 body:
   - type: input
     id: test-case-title
@@ -14,8 +17,6 @@ body:
       label: Preconditions
       description: "List any preconditions that must be met before executing this test case."
       placeholder: "E.g., User must be logged in, feature must be enabled."
-    validations:
-      required: true
 
   - type: checkboxes
     id: os-to-be-tested
@@ -29,6 +30,7 @@ body:
         - label: Android
         - label: iOS
         - label: "Other"
+    validations:
       required: true
 
   - type: input
@@ -37,8 +39,6 @@ body:
       label: Other OS (if selected above)
       description: "If 'Other' is selected, specify the operating system."
       placeholder: "Enter custom OS"
-    validations:
-      required: false
 
   - type: checkboxes
     id: cross-os
@@ -47,7 +47,6 @@ body:
       description: "Check if the test should be executed on multiple operating systems."
       options:
         - label: "Cross-OS testing is required"
-      required: false
 
   - type: input
     id: device-or-devices
@@ -55,8 +54,6 @@ body:
       label: Device or Devices
       description: "Specify the device(s) for testing (e.g., iPhone 12, Samsung Galaxy S21, MacBook Pro)."
       placeholder: "E.g., iPhone 12, MacBook Pro"
-    validations:
-      required: true
 
   - type: checkboxes
     id: browser-or-browsers
@@ -70,6 +67,7 @@ body:
         - label: Edge
         - label: Opera
         - label: "Other"
+    validations:
       required: true
 
   - type: input
@@ -78,8 +76,6 @@ body:
       label: Other Browser (if selected above)
       description: "If 'Other' is selected, specify the browser."
       placeholder: "Enter custom browser"
-    validations:
-      required: false
 
   - type: checkboxes
     id: cross-browser
@@ -88,7 +84,6 @@ body:
       description: "Check if the test should be executed across multiple browsers."
       options:
         - label: "Cross-browser testing is required"
-      required: false
 
   - type: textarea
     id: other-preconditions
@@ -96,8 +91,6 @@ body:
       label: Other Preconditions
       description: "List any additional preconditions or setup steps."
       placeholder: "E.g., Feature flag enabled, user permissions granted."
-    validations:
-      required: false
 
   - type: markdown
     attributes:
@@ -128,4 +121,5 @@ body:
         - label: "All expected results have passed"
         - label: "Some expected results have passed"
         - label: "All expected results have failed"
+    validations:
       required: true
