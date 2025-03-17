@@ -24,6 +24,12 @@ jobs:
             let labelsToAdd = [];
             let labelsToRemove = [];
 
+            // Ensure the issue has the "Test Case" label
+            if (!issueLabels.includes("Test Case")) {
+              console.log("This issue does not have the 'Test Case' label, skipping.");
+              return;
+            }
+
             // Check for checkboxes in the issue body
             if (issueBody.includes("- [x] Cross-browser testing is required")) {
               labelsToAdd.push("Cross-browser");
@@ -69,17 +75,19 @@ jobs:
               });
             }
 
-            // Close issue if "CNT" or "Duplicate" label is added
+            // Handle CNT and Duplicate labels, do not close the issue
             if (issueLabels.includes("CNT") || issueLabels.includes("Duplicate")) {
-              await github.rest.issues.update({
+              const commentBody = `This issue is marked as ${issueLabels.includes("CNT") ? "CNT" : "Duplicate"}. It will not be closed automatically.`;
+              await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: issue.number,
-                state: "closed"
+                body: commentBody
               });
+              return; // Do not proceed with closing or labeling the issue further
             }
 
-            // Handle Test Execution Results and close the issue accordingly
+            // Handle Test Execution Results (Passed/Failed) and add labels without closing
             if (issueBody.includes("- [x] All expected results have passed")) {
               await github.rest.issues.addLabels({
                 owner: context.repo.owner,
@@ -87,11 +95,11 @@ jobs:
                 issue_number: issue.number,
                 labels: ["Status: Done"]
               });
-              await github.rest.issues.update({
+              await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: issue.number,
-                state: "closed"
+                body: "Test case has been found as Passed. Done."
               });
             }
 
@@ -103,10 +111,10 @@ jobs:
                 issue_number: issue.number,
                 labels: ["Status: Fail"]
               });
-              await github.rest.issues.update({
+              await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: issue.number,
-                state: "closed"
+                body: "Test case has been found as Failed."
               });
             }
