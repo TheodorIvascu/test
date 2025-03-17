@@ -2,6 +2,13 @@ name: Test Case Template
 description: This template helps with writing test cases with predefined steps and expectations.
 
 body:
+  - type: markdown
+    attributes:
+      value: |
+        ⚠️ **Important Notice**  
+        - The **Test Execution Results** and **Expected Results** should **only** be marked by the tester who executes the test case.  
+        - Ensure all steps are clearly defined before execution.
+
   - type: textarea
     id: preconditions
     attributes:
@@ -77,13 +84,6 @@ body:
         - label: "Cross-browser testing is required"
 
   - type: textarea
-    id: other-preconditions
-    attributes:
-      label: Other Preconditions
-      description: "List any additional preconditions or setup steps."
-      placeholder: "E.g., Feature flag enabled, user permissions granted."
-
-  - type: textarea
     id: test-steps
     attributes:
       label: Test Steps
@@ -91,17 +91,17 @@ body:
       placeholder: |
         **Step 1:**
         - Write here step 1
-        - [ ] **Expected Results:**
+        - [ ] **Expected Results:** *(To be marked by the tester)*
         - Write here expected results for Step 1
         
         **Step 2:**
         - Write here step 2
-        - [ ] **Expected Results:**
+        - [ ] **Expected Results:** *(To be marked by the tester)*
         - Write here expected results for Step 2
         
         **Step 3:**
         - Write here step 3
-        - [ ] **Expected Results:**
+        - [ ] **Expected Results:** *(To be marked by the tester)*
         - Write here expected results for Step 3
         
         <!-- Add more steps as needed following the same format. -->
@@ -110,7 +110,7 @@ body:
     id: test-results
     attributes:
       label: Test Execution Results
-      description: "Indicate whether the expected results passed, failed, or partially passed."
+      description: "Indicate whether the expected results passed, failed, or partially passed. *(To be marked by the tester who executes the test case.)*"
       options:
         - label: "All expected results have passed"
         - label: "Some expected results have passed"
