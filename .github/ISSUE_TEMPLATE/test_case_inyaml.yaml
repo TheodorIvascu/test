@@ -11,6 +11,13 @@ body:
         - Ensure all steps are clearly defined before execution.
 
   - type: textarea
+    id: description
+    attributes:
+      label: Test Case Description
+      description: "Provide a detailed description of the test case, its purpose, and any important context."
+      placeholder: "E.g., This test case validates that the user can successfully log into the system with valid credentials."
+
+  - type: textarea
     id: preconditions
     attributes:
       label: Preconditions
@@ -122,4 +129,9 @@ body:
         
         **Step 3:**
         - Write here step 3
-        - [ ] **Expected Res
+        - [ ] **Expected Results:** *(To be marked by the tester)*
+        - Write here expected results for Step 3
+        
+        <!-- Add more steps as needed following the same format. -->
+
+  - type
