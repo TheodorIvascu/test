@@ -15,7 +15,27 @@ body:
     attributes:
       label: Preconditions
       description: "List any preconditions that must be met before executing this test case."
-      placeholder: "E.g., User must be logged in, feature must be enabled."
+      placeholder: |
+        E.g., 
+        - User must be logged in
+        - Feature must be enabled
+        - User must have admin rights
+        - Network connectivity is required
+        - Test data must be seeded
+        - Database should be accessible
+        - User permissions must be granted
+        - API keys must be set
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      description: "Select the environment where the test will be executed."
+      options:
+        - label: "Local"
+        - label: "Production"
+    validations:
+      required: true
 
   - type: checkboxes
     id: os-to-be-tested
@@ -102,19 +122,4 @@ body:
         
         **Step 3:**
         - Write here step 3
-        - [ ] **Expected Results:** *(To be marked by the tester)*
-        - Write here expected results for Step 3
-        
-        <!-- Add more steps as needed following the same format. -->
-
-  - type: checkboxes
-    id: test-results
-    attributes:
-      label: Test Execution Results
-      description: "Indicate whether the expected results passed, failed, or partially passed. *(To be marked by the tester who executes the test case.)*"
-      options:
-        - label: "All expected results have passed"
-        - label: "Some expected results have passed"
-        - label: "All expected results have failed"
-    validations:
-      required: true
+        - [ ] **Expected Res
