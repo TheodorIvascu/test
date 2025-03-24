@@ -1,0 +1,111 @@
+name: Auto Label Test Cases
+
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  test-case-labeling:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Apply dynamic labels based on test case form
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issue = context.payload.issue;
+            const body = issue.body || "";
+            const currentLabels = issue.labels.map(label => label.name);
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const issue_number = issue.number;
+
+            let labelsToAdd = [];
+            let labelsToRemove = [];
+
+            // Checkbox-triggered labels
+            const checkboxConfig = [
+              {
+                label: "Cross-browser",
+                text: "- [x] Cross-browser testing is required"
+              },
+              {
+                label: "Cross-OS",
+                text: "- [x] Cross-OS testing is required"
+              },
+              {
+                label: "Smoke",
+                text: "- [x] Include in Smoke Test Suite"
+              }
+            ];
+
+            for (const item of checkboxConfig) {
+              const checked = body.includes(item.text);
+              const hasLabel = currentLabels.includes(item.label);
+
+              if (checked && !hasLabel) {
+                labelsToAdd.push(item.label);
+              }
+              if (!checked && hasLabel) {
+                labelsToRemove.push(item.label);
+              }
+            }
+
+            // Dropdown-triggered testing type
+            const functionalTesting = body.includes("Type of Testing") && body.includes("Functional");
+            const nonFunctionalTesting = body.includes("Non-Functional");
+
+            const functionalLabel = "Functional Testing";
+            const nonFunctionalLabel = "Non-functional Testing";
+
+            // Determine what to add based on dropdown selection
+            const dropdownMap = {
+              "Functional": [functionalLabel],
+              "Non-Functional": [nonFunctionalLabel],
+              "Both": [functionalLabel, nonFunctionalLabel]
+            };
+
+            const matched = body.match(/Type of Testing.*\r?\n- (.+)/);
+            if (matched && matched[1]) {
+              const selected = matched[1].trim();
+              const dropdownLabels = dropdownMap[selected] || [];
+
+              for (const label of dropdownLabels) {
+                if (!currentLabels.includes(label)) {
+                  labelsToAdd.push(label);
+                }
+              }
+
+              // Also remove unselected type labels (if switched)
+              for (const label of [functionalLabel, nonFunctionalLabel]) {
+                if (!dropdownLabels.includes(label) && currentLabels.includes(label)) {
+                  labelsToRemove.push(label);
+                }
+              }
+            }
+
+            // Apply new labels
+            if (labelsToAdd.length > 0) {
+              await github.rest.issues.addLabels({
+                owner,
+                repo,
+                issue_number,
+                labels: labelsToAdd
+              });
+            }
+
+            // Remove unchecked labels
+            for (const label of labelsToRemove) {
+              await github.rest.issues.removeLabel({
+                owner,
+                repo,
+                issue_number,
+                name: label
+              }).catch(err => {
+                console.log(`Label '${label}' could not be removed:`, err.message);
+              });
+            }
