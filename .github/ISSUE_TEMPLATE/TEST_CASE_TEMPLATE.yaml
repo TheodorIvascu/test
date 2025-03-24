@@ -1,6 +1,6 @@
 name: Test Case Template
 description: This template helps with writing test cases with predefined steps and expectations.
-labels: [Test Case]  
+labels: [Test Case]
 
 body:
   - type: markdown
@@ -47,6 +47,18 @@ body:
       label: Test Case Description
       description: "Briefly describe the purpose or scope of this test case."
       placeholder: "E.g., This test verifies that login via Google OAuth works as expected."
+
+  - type: dropdown
+    id: testing-type
+    attributes:
+      label: Type of Testing
+      description: "Select the category this test case belongs to."
+      options:
+        - Functional
+        - Non-Functional
+        - Both
+    validations:
+      required: true
 
   - type: markdown
     attributes:
@@ -115,17 +127,17 @@ body:
         - Write here step 1
         - [ ] **Expected Results:** *(To be marked by the tester)*
         - Write here expected results for Step 1
-        
+
         **Step 2:**
         - Write here step 2
         - [ ] **Expected Results:** *(To be marked by the tester)*
         - Write here expected results for Step 2
-        
+
         **Step 3:**
         - Write here step 3
         - [ ] **Expected Results:** *(To be marked by the tester)*
         - Write here expected results for Step 3
-        
+
         <!-- Add more steps as needed following the same format. -->
 
   - type: markdown
