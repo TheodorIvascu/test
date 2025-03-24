@@ -9,12 +9,23 @@ body:
         - The **Test Execution Results** and **Expected Results** should **only** be marked by the tester who executes the test case.  
         - Ensure all steps are clearly defined before execution.
 
+  - type: markdown
+    attributes:
+      value: '---'
+
   - type: textarea
     id: preconditions
     attributes:
       label: Preconditions
       description: "List any preconditions that must be met before executing this test case."
       placeholder: "E.g., User must be logged in, feature must be enabled."
+
+  - type: input
+    id: resolution
+    attributes:
+      label: Screen Resolution (Optional)
+      description: "Enter the screen resolution for the test device (e.g., 1920x1080, 375x812)."
+      placeholder: "E.g., 1920x1080, 1440x900"
 
   - type: dropdown
     id: environment
@@ -35,6 +46,10 @@ body:
       label: Test Case Description
       description: "Briefly describe the purpose or scope of this test case."
       placeholder: "E.g., This test verifies that login via Google OAuth works as expected."
+
+  - type: markdown
+    attributes:
+      value: '---'
 
   - type: input
     id: os
@@ -77,6 +92,10 @@ body:
       description: "Specify the device(s) for testing (e.g., iPhone 12, Samsung Galaxy S21, MacBook Pro)."
       placeholder: "E.g., iPhone 12, MacBook Pro"
 
+  - type: markdown
+    attributes:
+      value: '---'
+
   - type: checkboxes
     id: smoke-suite
     attributes:
@@ -107,6 +126,10 @@ body:
         - Write here expected results for Step 3
         
         <!-- Add more steps as needed following the same format. -->
+
+  - type: markdown
+    attributes:
+      value: '---'
 
   - type: checkboxes
     id: test-results
