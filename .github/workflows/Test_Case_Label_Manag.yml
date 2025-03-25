@@ -27,68 +27,80 @@ jobs:
             let labelsToAdd = [];
             let labelsToRemove = [];
 
-            // Checkbox-triggered labels
-            const checkboxConfig = [
-              {
-                label: "Cross-browser",
-                text: "- [x] Cross-browser testing is required"
-              },
-              {
-                label: "Cross-OS",
-                text: "- [x] Cross-OS testing is required"
-              },
-              {
-                label: "Smoke",
-                text: "- [x] Include in Smoke Test Suite"
-              }
-            ];
-
-            for (const item of checkboxConfig) {
-              const checked = body.includes(item.text);
-              const hasLabel = currentLabels.includes(item.label);
-
-              if (checked && !hasLabel) {
-                labelsToAdd.push(item.label);
-              }
-              if (!checked && hasLabel) {
-                labelsToRemove.push(item.label);
-              }
-            }
-
-            // Dropdown-triggered testing type
-            const functionalTesting = body.includes("Type of Testing") && body.includes("Functional");
-            const nonFunctionalTesting = body.includes("Non-Functional");
-
-            const functionalLabel = "Functional Testing";
-            const nonFunctionalLabel = "Non-functional Testing";
-
-            // Determine what to add based on dropdown selection
-            const dropdownMap = {
-              "Functional": [functionalLabel],
-              "Non-Functional": [nonFunctionalLabel],
-              "Both": [functionalLabel, nonFunctionalLabel]
+            // Type of Testing labels
+            const testingTypeMap = {
+              "Navigation": "Navigation",
+              "Content Testing": "Content Testing",
+              "GUI and Usability": "GUI and Usability",
+              "Performance Testing": "Performance testing",
+              "Compatibility Testing": "Compatibility Testing"
             };
 
-            const matched = body.match(/Type of Testing.*\r?\n- (.+)/);
-            if (matched && matched[1]) {
-              const selected = matched[1].trim();
-              const dropdownLabels = dropdownMap[selected] || [];
+            const selectedTestingType = Object.keys(testingTypeMap).find(key => body.includes(`- ${key}`));
 
-              for (const label of dropdownLabels) {
-                if (!currentLabels.includes(label)) {
-                  labelsToAdd.push(label);
-                }
-              }
-
-              // Also remove unselected type labels (if switched)
-              for (const label of [functionalLabel, nonFunctionalLabel]) {
-                if (!dropdownLabels.includes(label) && currentLabels.includes(label)) {
-                  labelsToRemove.push(label);
-                }
+            for (const [key, label] of Object.entries(testingTypeMap)) {
+              if (selectedTestingType === key && !currentLabels.includes(label)) {
+                labelsToAdd.push(label);
+              } else if (selectedTestingType !== key && currentLabels.includes(label)) {
+                labelsToRemove.push(label);
               }
             }
 
-            // Apply new labels
+            // Execution context labels
+            const isLocal = body.includes("- Local");
+            const isProduction = body.includes("- Production");
+
+            if (isLocal && !currentLabels.includes("local")) {
+              labelsToAdd.push("local");
+            } else if (!isLocal && currentLabels.includes("local")) {
+              labelsToRemove.push("local");
+            }
+
+            if (isProduction && !currentLabels.includes("production")) {
+              labelsToAdd.push("production");
+            } else if (!isProduction && currentLabels.includes("production")) {
+              labelsToRemove.push("production");
+            }
+
+            // Section of the website
+            const sectionLabels = [
+              "Misiunea Noastra",
+              "Cum poti ajuta tu?",
+              "De ce sa ajuti?",
+              "Echipa",
+              "Povesti de succes",
+              "Footer"
+            ];
+
+            for (const section of sectionLabels) {
+              if (body.includes(`- ${section}`) && !currentLabels.includes(section)) {
+                labelsToAdd.push(section);
+              } else if (!body.includes(`- ${section}`) && currentLabels.includes(section)) {
+                labelsToRemove.push(section);
+              }
+            }
+
+            // Cross testing checkboxes
+            if (body.includes("- [x] Cross-OS testing is required") && !currentLabels.includes("Cross-OS")) {
+              labelsToAdd.push("Cross-OS");
+            } else if (!body.includes("- [x] Cross-OS testing is required") && currentLabels.includes("Cross-OS")) {
+              labelsToRemove.push("Cross-OS");
+            }
+
+            if (body.includes("- [x] Cross-browser testing is required") && !currentLabels.includes("Cross-browser")) {
+              labelsToAdd.push("Cross-browser");
+            } else if (!body.includes("- [x] Cross-browser testing is required") && currentLabels.includes("Cross-browser")) {
+              labelsToRemove.push("Cross-browser");
+            }
+
+            // Bug found checkbox
+            if (body.includes("- [x] Bug was discovered during test execution") && !currentLabels.includes("Bug(s) found")) {
+              labelsToAdd.push("Bug(s) found");
+            } else if (!body.includes("- [x] Bug was discovered during test execution") && currentLabels.includes("Bug(s) found")) {
+              labelsToRemove.push("Bug(s) found");
+            }
+
+            // Add new labels
             if (labelsToAdd.length > 0) {
               await github.rest.issues.addLabels({
                 owner,
@@ -98,7 +110,7 @@ jobs:
               });
             }
 
-            // Remove unchecked labels
+            // Remove unchecked or deselected labels
             for (const label of labelsToRemove) {
               await github.rest.issues.removeLabel({
                 owner,
