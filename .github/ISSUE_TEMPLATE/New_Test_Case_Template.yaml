@@ -87,6 +87,7 @@ body:
       label: Section of the Website
       description: "What part of the site is being tested?"
       options:
+        - Header
         - Misiunea Noastra
         - Cum poti ajuta tu?
         - De ce sa ajuti?
