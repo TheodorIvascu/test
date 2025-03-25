@@ -1,5 +1,5 @@
 name: Test Case Template (No Smoke)
-description: This version is used for general test cases without smoke testing.
+description: New version of the Test Case Template that will help testers grasp the form of a Test Case much more quickly.
 labels: [Test Case]
 
 body:
