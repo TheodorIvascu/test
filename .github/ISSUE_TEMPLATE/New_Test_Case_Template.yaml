@@ -191,4 +191,4 @@ body:
       label: Bug Discovery Acknowledgement
       description: "If this test resulted in a bug during execution, please check this. The actual bug should be logged separately."
       options:
-        - label: "✅ Bug was discovered during test execution"
+        - label: "Bug was discovered during test execution"
