@@ -35,7 +35,7 @@ jobs:
             };
 
             const isCheckboxChecked = (label) => {
-              const regex = new RegExp(`(- \\[x\\]|✅|☑️)\\s*${label}`, 'i');
+              const regex = new RegExp(`- \\[x\\]\\s*${label}`, 'i');
               return regex.test(body);
             };
 
@@ -61,8 +61,9 @@ jobs:
             ]);
 
             const handleCheckboxLabel = (checkboxLabel, gitHubLabel) => {
-              if (isCheckboxChecked(checkboxLabel) && !labels.includes(gitHubLabel)) labelsToAdd.push(gitHubLabel);
-              if (!isCheckboxChecked(checkboxLabel) && labels.includes(gitHubLabel)) labelsToRemove.push(gitHubLabel);
+              const checkedRegex = new RegExp(`- \\[x\\]\\s*${checkboxLabel}`, 'i');
+              if (checkedRegex.test(body) && !labels.includes(gitHubLabel)) labelsToAdd.push(gitHubLabel);
+              if (!checkedRegex.test(body) && labels.includes(gitHubLabel)) labelsToRemove.push(gitHubLabel);
             };
 
             handleCheckboxLabel("Cross-browser testing is required", "Cross-browser");
