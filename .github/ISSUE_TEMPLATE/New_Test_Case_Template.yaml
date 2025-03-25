@@ -1,0 +1,204 @@
+name: Test Case Template (No Smoke)
+description: This version is used for general test cases without smoke testing.
+labels: [Test Case]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ⚠️ **Test Case Guidelines – Please Read Before Submitting**
+
+        ✅ **Who should complete what?**
+        - Only the **tester who executes the test case** should check the **Expected Results** boxes and **Test Execution Results**.
+        - The **Bug Found** checkbox and related bug link should only be filled by the **tester who encountered the issue during execution**.
+
+        📝 **Title Format**
+        - Use this format for the test case title:  
+          **`TC - [Feature] - [Action] - [Expected Result]`**  
+          _Example: `TC - Login - Invalid Credentials - Error Message Shown`_
+
+        🧪 **Test Steps Format**
+        - Use the provided format for test steps and expected results.
+        - Stick to **one expected result per step** and use checkboxes clearly.
+        - You can refer to the Notion QA Guide for full structure and examples:
+          👉 [QA Guide - Asociația Oportunități și Cariere](https://brave-mandevilla-652.notion.site/QA-Guide-Asociatia-Oportunitati-si-Cariere-1ae185f480ff801db946d012460e564b)
+
+        🎯 **Be specific**
+        - Write clear, repeatable steps. 
+        - Expected results should be measurable and observable.
+
+        🧠 **Optional But Useful**
+        - Add resolution, device details, and testing type for better traceability.
+        - Link any related feature, story, or requirement in the description.
+
+  - type: markdown
+    attributes:
+      value: '---'
+
+  - type: textarea
+    id: preconditions
+    attributes:
+      label: Preconditions
+      description: "List any preconditions that must be met before executing this test case."
+      placeholder: "E.g., User must be logged in, feature must be enabled."
+
+  - type: input
+    id: resolution
+    attributes:
+      label: Screen Resolution (Optional)
+      description: "Enter the screen resolution for the test device (e.g., 1920x1080, 375x812)."
+      placeholder: "E.g., 1920x1080, 1440x900"
+
+  - type: dropdown
+    id: test-context
+    attributes:
+      label: Where is this test run?
+      description: "Select whether this test is executed in local development or on the live (production) website."
+      options:
+        - Local
+        - Production
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Test Case Description
+      description: "Briefly describe the purpose or scope of this test case."
+      placeholder: "E.g., This test verifies that login via Google OAuth works as expected."
+
+  - type: dropdown
+    id: testing-type
+    attributes:
+      label: Type of Testing
+      description: "Select the most appropriate testing category for this test case."
+      options:
+        - Navigation
+        - Content Testing
+        - GUI and Usability
+        - Performance Testing
+        - Compatibility Testing
+    validations:
+      required: true
+
+  - type: dropdown
+    id: website-section
+    attributes:
+      label: Section of the Website
+      description: "What part of the site is being tested?"
+      options:
+        - Misiunea Noastra
+        - Cum poti ajuta tu?
+        - De ce sa ajuti?
+        - Echipa
+        - Povesti de succes
+        - Footer
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: '---'
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating System
+      description: "Specify the OS or OSes this test should run on (e.g., Windows 11, macOS Ventura)."
+      placeholder: "E.g., Windows 11, Ubuntu 22.04, macOS Ventura"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: cross-os
+    attributes:
+      label: Cross-OS Testing
+      description: "Check if the test should be executed on multiple operating systems."
+      options:
+        - label: "Cross-OS testing is required"
+
+  - type: input
+    id: browser
+    attributes:
+      label: Browser(s)
+      description: "Specify the browser(s) this test should be executed on (e.g., Chrome, Firefox)."
+      placeholder: "E.g., Chrome 120, Firefox 122"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: cross-browser
+    attributes:
+      label: Cross-Browser Testing
+      description: "Check if the test should be executed across multiple browsers."
+      options:
+        - label: "Cross-browser testing is required"
+
+  - type: input
+    id: device-or-devices
+    attributes:
+      label: Device or Devices
+      description: "Specify the device(s) for testing (e.g., iPhone 12, Samsung Galaxy S21, MacBook Pro)."
+      placeholder: "E.g., iPhone 12, MacBook Pro"
+
+  - type: markdown
+    attributes:
+      value: '---'
+
+  - type: textarea
+    id: test-steps
+    attributes:
+      label: Test Steps
+      description: "Write out the steps required to execute the test case."
+      placeholder: |
+        **Step 1:**
+        - Write here step 1
+        - [ ] **Expected Results:** *(To be marked by the tester)*
+        - Write here expected results for Step 1
+
+        **Step 2:**
+        - Write here step 2
+        - [ ] **Expected Results:** *(To be marked by the tester)*
+        - Write here expected results for Step 2
+
+        **Step 3:**
+        - Write here step 3
+        - [ ] **Expected Results:** *(To be marked by the tester)*
+        - Write here expected results for Step 3
+
+        <!-- Add more steps as needed following the same format. -->
+
+  - type: markdown
+    attributes:
+      value: '---'
+
+  - type: checkboxes
+    id: test-results
+    attributes:
+      label: Test Execution Results
+      description: "Indicate whether the expected results passed, failed, or partially passed. *(To be marked by the tester who executes the test case.)*"
+      options:
+        - label: "All expected results have passed"
+        - label: "Some expected results have passed"
+        - label: "All expected results have failed"
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: '---'
+
+  - type: checkboxes
+    id: bug-found
+    attributes:
+      label: Was a Bug Found?
+      description: "Check this box if this test revealed a bug that is being tracked."
+      options:
+        - label: "This test case found a bug"
+
+  - type: input
+    id: bug-link
+    attributes:
+      label: Related Bug (if applicable)
+      description: "Paste the link to the issue that was created as a result of this test."
+      placeholder: "https://github.com/org/repo/issues/123"
