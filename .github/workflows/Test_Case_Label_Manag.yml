@@ -27,20 +27,17 @@ jobs:
             let labelsToAdd = [];
             let labelsToRemove = [];
 
-            // Helper to extract dropdown value from markdown
             function getDropdownValue(label) {
               const regex = new RegExp(`${label}\s*\n(.*?)\n`, 'i');
               const match = body.match(regex);
               return match ? match[1].trim() : null;
             }
 
-            // Updated Helper to detect checkbox status including emojis like ✅
             function isCheckboxChecked(label) {
               const regex = new RegExp(`(- \[x\]|✅|☑️)\s*${label}`, 'i');
               return regex.test(body);
             }
 
-            // Type of Testing labels
             const testingTypeMap = {
               "Navigation": "Navigation",
               "Content Testing": "Content Testing",
@@ -50,28 +47,30 @@ jobs:
             };
 
             const selectedTestingType = getDropdownValue("Type of Testing");
-            for (const [key, label] of Object.entries(testingTypeMap)) {
-              if (selectedTestingType === key && !currentLabels.includes(label)) {
-                labelsToAdd.push(label);
-              } else if (selectedTestingType !== key && currentLabels.includes(label)) {
-                labelsToRemove.push(label);
+            if (selectedTestingType) {
+              for (const [key, label] of Object.entries(testingTypeMap)) {
+                if (selectedTestingType === key && !currentLabels.includes(label)) {
+                  labelsToAdd.push(label);
+                } else if (selectedTestingType !== key && currentLabels.includes(label)) {
+                  labelsToRemove.push(label);
+                }
               }
             }
 
-            // Execution context labels
             const selectedContext = getDropdownValue("Where is this test run\?");
-            if (selectedContext === "Local" && !currentLabels.includes("local")) {
-              labelsToAdd.push("local");
-            } else if (selectedContext !== "Local" && currentLabels.includes("local")) {
-              labelsToRemove.push("local");
-            }
-            if (selectedContext === "Production" && !currentLabels.includes("production")) {
-              labelsToAdd.push("production");
-            } else if (selectedContext !== "Production" && currentLabels.includes("production")) {
-              labelsToRemove.push("production");
+            if (selectedContext) {
+              if (selectedContext === "Local" && !currentLabels.includes("local")) {
+                labelsToAdd.push("local");
+              } else if (selectedContext !== "Local" && currentLabels.includes("local")) {
+                labelsToRemove.push("local");
+              }
+              if (selectedContext === "Production" && !currentLabels.includes("production")) {
+                labelsToAdd.push("production");
+              } else if (selectedContext !== "Production" && currentLabels.includes("production")) {
+                labelsToRemove.push("production");
+              }
             }
 
-            // Section of the website
             const sectionLabels = [
               "Misiunea Noastra",
               "Cum poti ajuta tu?",
@@ -82,15 +81,16 @@ jobs:
               "Header"
             ];
             const selectedSection = getDropdownValue("Section of the Website");
-            for (const section of sectionLabels) {
-              if (selectedSection === section && !currentLabels.includes(section)) {
-                labelsToAdd.push(section);
-              } else if (selectedSection !== section && currentLabels.includes(section)) {
-                labelsToRemove.push(section);
+            if (selectedSection) {
+              for (const section of sectionLabels) {
+                if (selectedSection === section && !currentLabels.includes(section)) {
+                  labelsToAdd.push(section);
+                } else if (selectedSection !== section && currentLabels.includes(section)) {
+                  labelsToRemove.push(section);
+                }
               }
             }
 
-            // Cross testing checkboxes
             if (isCheckboxChecked("Cross-OS testing is required") && !currentLabels.includes("Cross-OS")) {
               labelsToAdd.push("Cross-OS");
             } else if (!isCheckboxChecked("Cross-OS testing is required") && currentLabels.includes("Cross-OS")) {
@@ -103,14 +103,12 @@ jobs:
               labelsToRemove.push("Cross-browser");
             }
 
-            // Bug found checkbox
             if (isCheckboxChecked("Bug was discovered during test execution") && !currentLabels.includes("Bug(s) found")) {
               labelsToAdd.push("Bug(s) found");
             } else if (!isCheckboxChecked("Bug was discovered during test execution") && currentLabels.includes("Bug(s) found")) {
               labelsToRemove.push("Bug(s) found");
             }
 
-            // Add new labels
             if (labelsToAdd.length > 0) {
               await github.rest.issues.addLabels({
                 owner,
@@ -120,7 +118,6 @@ jobs:
               });
             }
 
-            // Remove unchecked or deselected labels
             for (const label of labelsToRemove) {
               await github.rest.issues.removeLabel({
                 owner,
