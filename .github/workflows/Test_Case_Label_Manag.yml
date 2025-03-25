@@ -27,6 +27,13 @@ jobs:
             let labelsToAdd = [];
             let labelsToRemove = [];
 
+            // Helper to extract dropdown value from markdown
+            function getDropdownValue(label) {
+              const regex = new RegExp(`${label}\\s*\\n(.*?)\\n`);
+              const match = body.match(regex);
+              return match ? match[1].trim() : null;
+            }
+
             // Type of Testing labels
             const testingTypeMap = {
               "Navigation": "Navigation",
@@ -36,8 +43,7 @@ jobs:
               "Compatibility Testing": "Compatibility Testing"
             };
 
-            const selectedTestingType = Object.keys(testingTypeMap).find(key => body.includes(`- ${key}`));
-
+            const selectedTestingType = getDropdownValue("Type of Testing");
             for (const [key, label] of Object.entries(testingTypeMap)) {
               if (selectedTestingType === key && !currentLabels.includes(label)) {
                 labelsToAdd.push(label);
@@ -47,18 +53,15 @@ jobs:
             }
 
             // Execution context labels
-            const isLocal = body.includes("- Local");
-            const isProduction = body.includes("- Production");
-
-            if (isLocal && !currentLabels.includes("local")) {
+            const selectedContext = getDropdownValue("Where is this test run\?");
+            if (selectedContext === "Local" && !currentLabels.includes("local")) {
               labelsToAdd.push("local");
-            } else if (!isLocal && currentLabels.includes("local")) {
+            } else if (selectedContext !== "Local" && currentLabels.includes("local")) {
               labelsToRemove.push("local");
             }
-
-            if (isProduction && !currentLabels.includes("production")) {
+            if (selectedContext === "Production" && !currentLabels.includes("production")) {
               labelsToAdd.push("production");
-            } else if (!isProduction && currentLabels.includes("production")) {
+            } else if (selectedContext !== "Production" && currentLabels.includes("production")) {
               labelsToRemove.push("production");
             }
 
@@ -69,13 +72,14 @@ jobs:
               "De ce sa ajuti?",
               "Echipa",
               "Povesti de succes",
-              "Footer"
+              "Footer",
+              "Header"
             ];
-
+            const selectedSection = getDropdownValue("Section of the Website");
             for (const section of sectionLabels) {
-              if (body.includes(`- ${section}`) && !currentLabels.includes(section)) {
+              if (selectedSection === section && !currentLabels.includes(section)) {
                 labelsToAdd.push(section);
-              } else if (!body.includes(`- ${section}`) && currentLabels.includes(section)) {
+              } else if (selectedSection !== section && currentLabels.includes(section)) {
                 labelsToRemove.push(section);
               }
             }
