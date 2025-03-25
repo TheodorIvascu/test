@@ -1,5 +1,5 @@
 name: Test Case Template (No Smoke)
-description: New version of the Test Case Template that will help testers grasp the form of a Test Case much more quickly.
+description: This version is used for general test cases without smoke testing.
 labels: [Test Case]
 
 body:
@@ -10,7 +10,7 @@ body:
 
         ✅ **Who should complete what?**
         - Only the **tester who executes the test case** should check the **Expected Results** boxes and **Test Execution Results**.
-        - The **Bug Found** checkbox and related bug link should only be filled by the **tester who encountered the issue during execution**.
+        - The **Bug Found** indicator should only be marked if a bug was found during execution (not while authoring).
 
         📝 **Title Format**
         - Use this format for the test case title:  
@@ -184,21 +184,10 @@ body:
     validations:
       required: true
 
-  - type: markdown
-    attributes:
-      value: '---'
-
   - type: checkboxes
-    id: bug-found
+    id: execution-bug-check
     attributes:
-      label: Was a Bug Found?
-      description: "Check this box if this test revealed a bug that is being tracked."
+      label: Bug Discovery Acknowledgement
+      description: "If this test resulted in a bug during execution, please check this. The actual bug should be logged separately."
       options:
-        - label: "This test case found a bug"
-
-  - type: input
-    id: bug-link
-    attributes:
-      label: Related Bug (if applicable)
-      description: "Paste the link to the issue that was created as a result of this test."
-      placeholder: "https://github.com/org/repo/issues/123"
+        - label: "✅ Bug was discovered during test execution"
