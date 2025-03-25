@@ -51,8 +51,7 @@ jobs:
               "Performance testing", "Compatibility Testing"
             ]);
 
-            const contextValue = getDropdownValue("Where is this test run\\?");
-            handleLabels(contextValue, ["local", "production"]);
+            handleLabels(getDropdownValue("Where is this test run\\?"), ["local", "production"]);
 
             handleLabels(getDropdownValue("Section of the Website"), [
               "Header", "Misiunea Noastra", "Cum poti ajuta si tu?",
@@ -66,13 +65,7 @@ jobs:
 
             handleCheckboxLabel("Cross-browser testing is required", "Cross-browser");
             handleCheckboxLabel("Cross-OS testing is required", "Cross-OS");
-
-            const bugFoundChecked = isCheckboxChecked("Bug was discovered during test execution");
-            if (bugFoundChecked && !labels.includes("Bug(s) found")) {
-              labelsToAdd.push("Bug(s) found");
-            } else if (!bugFoundChecked && labels.includes("Bug(s) found")) {
-              labelsToRemove.push("Bug(s) found");
-            }
+            handleCheckboxLabel("Bug Discovery Acknowledgement", "Bug(s) found");
 
             if (labelsToAdd.length > 0) {
               await github.rest.issues.addLabels({owner, repo, issue_number, labels: labelsToAdd});
