@@ -61,10 +61,10 @@ body:
       required: true
 
   - type: textarea
-    id: description
+    id: description   ---> de discuttat 
     attributes:
       label: Test Case Description
-      description: "Briefly describe the purpose or scope of this test case."
+      description: "Briefly describe the purpose or scope of this test case."  
       placeholder: "E.g., This test verifies that login via Google OAuth works as expected."
 
   - type: dropdown
