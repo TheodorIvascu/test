@@ -192,4 +192,4 @@ body:
       description: "If this test resulted in a bug during execution, please check this. The actual bug should be logged separately."
       options:
         - label: "Bug was discovered during test execution"
-"ce as mai adauga - un field de test data pentru test caseurile in care avem de introdus date..de exemplu in anumite fielduri"
+ce as mai adauga - un field de test data pentru test caseurile in care avem de introdus date..de exemplu in anumite fielduri
