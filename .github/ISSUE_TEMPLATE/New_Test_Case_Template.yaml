@@ -1,12 +1,13 @@
-name: Test Case Template (No Smoke)
-description: This version is used for general test cases without smoke testing.
+name: Test Case Template v 1.0
+description: Test Case template used by Testers.
 labels: [Test Case]
 
 body:
   - type: markdown
     attributes:
       value: |
-        ⚠️ **Test Case Guidelines – Please Read Before Submitting**
+        <details>
+        <summary>⚠️ <strong>Test Case Guidelines – Click to Expand</strong></summary>
 
         ✅ **Who should complete what?**
         - Only the **tester who executes the test case** should check the **Expected Results** boxes and **Test Execution Results**.
@@ -24,12 +25,13 @@ body:
           👉 [QA Guide - Asociația Oportunități și Cariere](https://brave-mandevilla-652.notion.site/QA-Guide-Asociatia-Oportunitati-si-Cariere-1ae185f480ff801db946d012460e564b)
 
         🎯 **Be specific**
-        - Write clear, repeatable steps   ---> REPEATABLE ? what this means?. 
-        - Expected results should be measurable and observable.
+        - Write clear, repeatable steps –> _**Repeatable** means the steps should be so clear and consistent that **any tester** could follow them and get the same results._
 
         🧠 **Optional But Useful**
         - Add resolution, device details, and testing type for better traceability.
         - Link any related feature, story, or requirement in the description.
+
+        </details>
 
   - type: markdown
     attributes:
@@ -41,6 +43,13 @@ body:
       label: Preconditions
       description: "List any preconditions that must be met before executing this test case."
       placeholder: "E.g., User must be logged in, feature must be enabled."
+
+  - type: textarea
+    id: test-data
+    attributes:
+      label: Test Data (Optional)
+      description: "Enter any test data required for this test case (e.g., sample names, email addresses, IDs)."
+      placeholder: "E.g., Name: John Doe, Email: john@example.com, Password: Test123!"
 
   - type: input
     id: resolution
@@ -64,7 +73,7 @@ body:
     id: description 
     attributes:
       label: Test Case Description
-      description: "Briefly describe the purpose or scope of this test case. DE DISCUTAT"  
+      description: "Briefly describe the purpose or scope of this test case."
       placeholder: "E.g., This test verifies that login via Google OAuth works as expected."
 
   - type: dropdown
@@ -189,7 +198,6 @@ body:
     id: execution-bug-check
     attributes:
       label: Bug Discovery Acknowledgement
-      description: "If this test resulted in a bug during execution, please check this. The actual bug should be logged separately. ce as mai adauga - un field de test data pentru test caseurile in care avem de introdus date..de exemplu in anumite fielduri
-"
+      description: "If this test resulted in a bug during execution, please check this. The actual bug should be logged separately."
       options:
         - label: "Bug was discovered during test execution"
